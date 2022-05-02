@@ -48,6 +48,15 @@ public class Main extends JFrame {
         button2.setText("新增");
         contentPane.add(button2);
         button2.setBounds(610, 355, 100, 30);
+        button2.addActionListener(
+                (e)->{
+
+                    Item item=new Item();
+                    AddItem addItem=new AddItem(item);
+                    addItem.setVisible(true);
+
+                }
+        );
 
         button3.setText("修改");
         contentPane.add(button3);
@@ -114,7 +123,7 @@ public class Main extends JFrame {
         String dbPassword = "Mysql_123456";
         String url = "jdbc:mysql://118.190.148.144:3306/supermarket?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true";
         Statement stmt = null;
-        String sql = "SELECT * FROM Item";
+        String sql = "SELECT * FROM item";
         ResultSet rs = null;
         try {
             conn = DriverManager.getConnection(url, user, dbPassword);
