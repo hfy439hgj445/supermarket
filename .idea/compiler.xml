@@ -9,5 +9,8 @@
         <module name="supermarket" />
       </profile>
     </annotationProcessing>
+    <bytecodeTargetLevel>
+      <module name="wxpaydemo" target="1.5" />
+    </bytecodeTargetLevel>
   </component>
 </project>

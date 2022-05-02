@@ -20,6 +20,7 @@ public class Main extends JFrame {
         button2 = new JButton();
         button3 = new JButton();
         button4 = new JButton();
+        JButton button5 = new JButton();
         label1 = new JLabel();
         textField1 = new JTextField();
 
@@ -113,6 +114,17 @@ public class Main extends JFrame {
         setLocationRelativeTo(getOwner());
         this.setBounds(300, 300, 1000, 415);
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+
+        button5.setText("支付");
+        contentPane.add(button5);
+        button5.setBounds(810, 355, 100, 30);
+        button5.addActionListener(
+                (e)->{
+                    this.setVisible(false);
+                    Pay pay=new Pay();
+                    pay.setVisible(true);
+                }
+        );
     }
 
     public Object[][] getDataFromDatabase() {
