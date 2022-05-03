@@ -8,12 +8,13 @@ import javax.swing.table.DefaultTableModel;
 /**
  * @liwei
  */
-public class Main extends JFrame {
-    public Main() {
-        initComponents();
+public class QueryItem extends JFrame {
+    //String result;
+    public QueryItem(String result) {
+        initComponents(result);
     }
 
-    private void initComponents() {
+    private void initComponents(String result) {
         scrollPane1 = new JScrollPane();
         table1 = new JTable();
         button1 = new JButton();
@@ -21,11 +22,10 @@ public class Main extends JFrame {
         button3 = new JButton();
         button4 = new JButton();
         JButton button5 = new JButton();
-        JButton button6 = new JButton();
         label1 = new JLabel();
-        textField1 = new JTextField();
 
-        DefaultTableModel tableModel = new DefaultTableModel(getDataFromDatabase(), head) {
+
+        DefaultTableModel tableModel = new DefaultTableModel(getDataFromDatabase(result), head) {
             public boolean isCellEditable(int row, int column) {
                 return false;
             }
@@ -45,32 +45,11 @@ public class Main extends JFrame {
 
         button1.setText("删除");
         contentPane.add(button1);
-        button1.setBounds(410, 355, 100, 30);
-        button1.addActionListener(
-                (e)->{
-                    int rowNo = table1.getSelectedRow();//获取所选的行号
-                    int id=(int)table1.getValueAt(rowNo, 0);
-                    String title=(String)table1.getValueAt(rowNo, 1);
-                    Float price=(Float)table1.getValueAt(rowNo, 2);
-                    String description=(String)table1.getValueAt(rowNo, 3);
-                    int sales=(int)table1.getValueAt(rowNo, 4);
-                    String img_url=(String)table1.getValueAt(rowNo, 5);
-                    System.out.print(id+" ");
-                    System.out.print(title+" ");
-                    System.out.print(price+" ");
-                    System.out.print(description+" ");
-                    System.out.print(sales+" ");
-                    System.out.println(img_url+" ");
-                    System.out.println("删除成功");
-
-                    Item item=new Item(id,title,price,description,sales,img_url);
-                    DeleteDate executeUpdate=new DeleteDate(item);
-                    executeUpdate.setVisible(true);
-                });
+        button1.setBounds(510, 355, 100, 30);
 
         button2.setText("新增");
         contentPane.add(button2);
-        button2.setBounds(510, 355, 100, 30);
+        button2.setBounds(610, 355, 100, 30);
         button2.addActionListener(
                 (e)->{
 
@@ -83,7 +62,7 @@ public class Main extends JFrame {
 
         button3.setText("修改");
         contentPane.add(button3);
-        button3.setBounds(610, 355, 100, 30);
+        button3.setBounds(710, 355, 100, 30);
         button3.addActionListener(
                 (e)->{
                     int rowNo = table1.getSelectedRow();//获取所选的行号
@@ -107,60 +86,16 @@ public class Main extends JFrame {
                 }
         );
 
-        contentPane.add(textField1);
-        textField1.setBounds(170, 355, 130, 30);
 
-        button4.setText("查询");
+        button4.setText("返回");
         contentPane.add(button4);
-        button4.setBounds(310, 355, 100, 30);
+        button4.setBounds(410, 355, 100, 30);
         button4.addActionListener(
                 (e) -> {
 
-                    String result = textField1.getText();
-                    System.out.println(result);
                     this.setVisible(false);
-                    QueryItem queryItem=new QueryItem(result);
-                    queryItem.setVisible(true);
-                    /*java.util.List<Item> list = new ArrayList<Item>();
-                    String user = "root";
-                    String dbPassword = "Mysql_123456";
-                    String url = "jdbc:mysql://118.190.148.144:3306/supermarket?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true";
-
-                    Connection conn = null;
-
-                    String sql = "SELECT * FROM item WHERE id='" + result + "' ";
-                    System.out.println(sql);
-                    ResultSet rs = null;
-                    Statement stmt = null;
-
-                    try {
-                        conn = DriverManager.getConnection(url, user, dbPassword);
-                        stmt = conn.createStatement();
-                        rs = stmt.executeQuery(sql);
-                        while (rs.next()) {
-
-
-                            Item item = new Item();
-                            item.setId(rs.getInt("id"));
-                            item.setTitle(rs.getString("title"));
-                            item.setPrice(rs.getFloat("price"));
-                            item.setDescription(rs.getString("description"));
-                            item.setSales(rs.getInt("sales"));
-                            item.setImg_url(rs.getString("img_url"));
-                            //System.out.println("id"+','+"title"+','+"price"+','+"description"+','+"sales"+','+"img_url");
-                            list.add(item);
-                            System.out.println(list);
-
-
-
-
-                        }
-
-
-                    } catch (SQLException throwables) {
-                        throwables.printStackTrace();
-                    }*/
-
+                    Main main=new Main();
+                    main.setVisible(true);
 
                 }
         );
@@ -190,7 +125,7 @@ public class Main extends JFrame {
 
         button5.setText("支付");
         contentPane.add(button5);
-        button5.setBounds(710, 355, 100, 30);
+        button5.setBounds(810, 355, 100, 30);
         button5.addActionListener(
                 (e)->{
                     this.setVisible(false);
@@ -198,19 +133,9 @@ public class Main extends JFrame {
                     pay.setVisible(true);
                 }
         );
-
-        button6.setText("刷新");
-        contentPane.add(button6);
-        button6.setBounds(810, 355, 100, 30);
-        button6.addActionListener(
-                (e)->{
-                    this.setVisible(false);
-                    Main main=new Main();
-                    main.setVisible(true);
-                });
     }
 
-    public Object[][] getDataFromDatabase() {
+    public Object[][] getDataFromDatabase(String result) {
 
         java.util.List<Item> list = new ArrayList<Item>();
         Connection conn = null;
@@ -218,7 +143,7 @@ public class Main extends JFrame {
         String dbPassword = "Mysql_123456";
         String url = "jdbc:mysql://118.190.148.144:3306/supermarket?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true";
         Statement stmt = null;
-        String sql = "SELECT * FROM item";
+        String sql = "SELECT * FROM item WHERE id="+result;
         ResultSet rs = null;
         try {
             conn = DriverManager.getConnection(url, user, dbPassword);
@@ -273,7 +198,7 @@ public class Main extends JFrame {
     private JTextField textField1;
     private JLabel label1;
 
-    public static void main(String[] args) {
-        new Main();
+    public static void main(String[] args,String result) {
+        new QueryItem(result);
     }
 }

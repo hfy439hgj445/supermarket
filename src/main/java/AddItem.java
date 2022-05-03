@@ -110,7 +110,11 @@ public class AddItem extends JFrame {
                         pstmt.executeUpdate();
 
                         if(sql!=null){
+                            this.setVisible(false);
                             System.out.println("新增成功");
+
+                            Main main=new Main();
+                            main.setVisible(true);
                         }
 
 

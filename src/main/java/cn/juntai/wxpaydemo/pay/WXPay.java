@@ -54,10 +54,10 @@ public class WXPay {
         cn.juntai.wxpaydemo.sdk.WXPay wxpay = new cn.juntai.wxpaydemo.sdk.WXPay(config);
         String out_trade_no = DateUtil.getCurrentTime();
         Map<String, String> map = new HashMap<>(16);
-        map.put("attach", "订单额外描述");
+        map.put("attach", "id,11112;price,0.01;amount,1;");
         map.put("auth_code", auth_code);
-        map.put("body", "小米手机");
-        map.put("device_info", "桂电1号店");
+        map.put("body", "test");
+        map.put("device_info", "小米手机");
         map.put("nonce_str", WXPayUtil.generateNonceStr());
         map.put("out_trade_no", out_trade_no);
         map.put("spbill_create_ip", spbill_create_ip);
