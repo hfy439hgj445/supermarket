@@ -22,6 +22,11 @@ import java.util.TreeMap;
 
 public class WXPay {
 
+    String id;
+    String name;
+    String price;
+    String amount;
+
     private static Log log = LogFactory.getLog(WXPay.class);
 
     private static final String PAY_SUCCESS = "SUCCESS";
@@ -41,7 +46,7 @@ public class WXPay {
      *
      * @throws Exception
      */
-    public static String scanCodeToPay(String auth_code) throws Exception {
+    public static String scanCodeToPay(String auth_code,String id,String name,String price,String amount) throws Exception {
         InetAddress addr = null;
         try {
             addr = InetAddress.getLocalHost();
@@ -54,14 +59,18 @@ public class WXPay {
         cn.juntai.wxpaydemo.sdk.WXPay wxpay = new cn.juntai.wxpaydemo.sdk.WXPay(config);
         String out_trade_no = DateUtil.getCurrentTime();
         Map<String, String> map = new HashMap<>(16);
-        map.put("attach", "id,11112;price,0.01;amount,1;");
+        map.put("attach", "id,"+id+";price,"+price+";amount,"+amount+";");
         map.put("auth_code", auth_code);
-        map.put("body", "test");
-        map.put("device_info", "小米手机");
+        map.put("body", name);
+        map.put("device_info", "013467007045764");
         map.put("nonce_str", WXPayUtil.generateNonceStr());
         map.put("out_trade_no", out_trade_no);
         map.put("spbill_create_ip", spbill_create_ip);
-        map.put("total_fee", "1");
+        float price_f=Float.valueOf(price)*100;
+        int count=Integer.valueOf(amount);
+        int total=(int)price_f*count;
+        String total_fee =String.valueOf(total);
+        map.put("total_fee", total_fee);
         //生成签名
         String sign = WXPayUtil.generateSignature(map, config.getKey());
         map.put("sign", sign);
@@ -134,7 +143,7 @@ public class WXPay {
     /*
     下单：生成二维码
      */
-    public static void unifiedOrder() {
+    public static void unifiedOrder(String id,String name,String price,String amount) {
         Map<String, String> resultMap = new HashMap();
         String openid = "ouR0E1oP5UGTEBce8jZ_sChfH26g";
         MyConfig config = null;
@@ -157,9 +166,12 @@ public class WXPay {
         }
         String spbill_create_ip = addr.getHostAddress();
         //支付金额，需要转成字符串类型，否则后面的签名会失败
-        int total_fee = 1;//100分：1块钱
+        float price_f=Float.valueOf(price)*100;
+        int count=Integer.valueOf(amount);
+        int total=(int)price_f*count;
+        String total_fee =String.valueOf(total);//金额
         //商品描述
-        String body = "test";
+        String body = name;
         //商户订单号
         String out_trade_no = WXPayUtil.generateNonceStr();
         //统一下单接口参数
@@ -173,8 +185,8 @@ public class WXPay {
         data.put("out_trade_no", out_trade_no);//交易号
         data.put("spbill_create_ip", spbill_create_ip);//下单的电脑IP地址
         data.put("trade_type", "NATIVE");//支付类型
-        data.put("total_fee", String.valueOf(total_fee));
-        String p="id,11112;price,0.01;amount,1;";
+        data.put("total_fee",total_fee);
+        String p="id,"+id+";price,"+price+";amount,"+amount+";";
         data.put("attach",p);
         //data.put("openid", openid);
 
@@ -198,7 +210,7 @@ public class WXPay {
             hints.put(EncodeHintType.CHARACTER_SET, "UTF-8");
             hints.put(EncodeHintType.ERROR_CORRECTION, ErrorCorrectionLevel.L);
             hints.put(EncodeHintType.MARGIN, 0);
-            BitMatrix bitMatrix = new MultiFormatWriter().encode(url, BarcodeFormat.QR_CODE, 300, 300, hints);
+            BitMatrix bitMatrix = new MultiFormatWriter().encode(url, BarcodeFormat.QR_CODE, 200, 200, hints);
 
             MatrixToImageWriter.writeToStream(bitMatrix, "jpg", fileOutputStream);
         } catch (Exception e) {

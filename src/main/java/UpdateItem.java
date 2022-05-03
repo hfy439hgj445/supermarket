@@ -1,4 +1,5 @@
 import java.awt.*;
+import java.sql.*;
 import javax.swing.*;
 
 /**
@@ -32,7 +33,7 @@ public class UpdateItem extends JFrame {
         contentPane.setLayout(null);
 
         //---- label1 ----
-        label1.setText("\u5546\u54c1ID\uff1a");//商品ID
+        label1.setText("\u5546\u54c1ID\uff1a");
         contentPane.add(label1);
         label1.setBounds(20, 20, 55, 20);
         contentPane.add(textField1);
@@ -40,7 +41,7 @@ public class UpdateItem extends JFrame {
         textField1.setText(String.valueOf(item.getId()));
 
         //---- label2 ----
-        label2.setText("\u5546\u54c1\u540d\u79f0\uff1a");//商品名称
+        label2.setText("\u5546\u54c1\u540d\u79f0\uff1a");
         contentPane.add(label2);
         label2.setBounds(240, 20, 90, 20);
         contentPane.add(textField2);
@@ -48,7 +49,7 @@ public class UpdateItem extends JFrame {
         textField2.setText(item.getTitle());
 
         //---- label3 ----
-        label3.setText("\u5355\u4ef7\uff1a");//单价
+        label3.setText("\u5355\u4ef7\uff1a");
         contentPane.add(label3);
         label3.setBounds(20, 80, 55, 20);
         contentPane.add(textField3);
@@ -56,7 +57,7 @@ public class UpdateItem extends JFrame {
         textField3.setText(String.valueOf(item.getPrice()));
 
         //---- label4 ----
-        label4.setText("\u63cf\u8ff0\uff1a");//描述
+        label4.setText("\u63cf\u8ff0\uff1a");
         contentPane.add(label4);
         label4.setBounds(240, 80, 90, 20);
         contentPane.add(textField4);
@@ -64,7 +65,7 @@ public class UpdateItem extends JFrame {
         textField4.setText(item.getDescription());
 
         //---- label5 ----
-        label5.setText("\u4fc3\u9500\u4ef7\uff1a");//促销价
+        label5.setText("\u4fc3\u9500\u4ef7\uff1a");
         contentPane.add(label5);
         label5.setBounds(20, 140, 55, 20);
         contentPane.add(textField5);
@@ -72,7 +73,7 @@ public class UpdateItem extends JFrame {
         textField5.setText(String.valueOf(item.getSales()));
 
         //---- label6 ----
-        label6.setText("\u5546\u54c1\u56fe\u7247\uff1a");//商品图片
+        label6.setText("\u5546\u54c1\u56fe\u7247\uff1a");
         contentPane.add(label6);
         label6.setBounds(240, 140, 90, 20);
         contentPane.add(textField6);
@@ -85,10 +86,48 @@ public class UpdateItem extends JFrame {
         button1.setBounds(200, 300, 100, 30);
         button1.addActionListener(
                 (e)->{
-                    System.out.println("准备保存");
-                    // 执行UPDATE
+
+                    String id=textField1.getText();
+                    String title=textField2.getText();
+                    String price=textField3.getText();
+                    String description=textField4.getText();
+                    String sales=textField5.getText();
+                    String img_url=textField6.getText();
+
+                    String user = "root";
+                    String dbPassword = "Mysql_123456";
+                    String url = "jdbc:mysql://118.190.148.144:3306/supermarket?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true";
+                    Connection conn = null;
+
+                    String sql = "UPDATE item SET title=?,price=?,description=?,sales=?,img_url=? WHERE id=?";
+                    System.out.println(sql);
+                    PreparedStatement pstmt = null;
+
+                    try {
+                        conn = DriverManager.getConnection(url, user, dbPassword);
+                        pstmt = conn.prepareStatement(sql);
+                        pstmt.setString(1,title);
+                        pstmt.setString(2,price);
+                        pstmt.setString(3,description);
+                        pstmt.setString(4,sales);
+                        pstmt.setString(5,img_url);
+                        pstmt.setString(6,id);
+
+                        int result=pstmt.executeUpdate();
+
+                        this.setVisible(false);
+                        Main main=new Main();
+                        main.setVisible(true);
+
+                    } catch (SQLException throwables) {
+                        throwables.printStackTrace();
+                    }
+
                 }
+
         );
+
+
 
         {
             // compute preferred size

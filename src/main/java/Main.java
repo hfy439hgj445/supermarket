@@ -61,11 +61,12 @@ public class Main extends JFrame {
                     System.out.print(description+" ");
                     System.out.print(sales+" ");
                     System.out.println(img_url+" ");
-                    System.out.println("删除成功");
 
                     Item item=new Item(id,title,price,description,sales,img_url);
+                    this.setVisible(false);
                     DeleteDate executeUpdate=new DeleteDate(item);
-                    executeUpdate.setVisible(true);
+                    Main main=new Main();
+                    main.setVisible(true);
                 });
 
         button2.setText("新增");
@@ -73,11 +74,10 @@ public class Main extends JFrame {
         button2.setBounds(510, 355, 100, 30);
         button2.addActionListener(
                 (e)->{
-
+                    this.setVisible(false);
                     Item item=new Item();
                     AddItem addItem=new AddItem(item);
                     addItem.setVisible(true);
-
                 }
         );
 
@@ -100,6 +100,7 @@ public class Main extends JFrame {
                     System.out.println(sales);
                     System.out.println(img_url);
 
+                    this.setVisible(false);
                     Item item=new Item(id,title,price,description,sales,img_url);
 
                     UpdateItem updateItem=new UpdateItem(item);
@@ -193,8 +194,17 @@ public class Main extends JFrame {
         button5.setBounds(710, 355, 100, 30);
         button5.addActionListener(
                 (e)->{
-                    this.setVisible(false);
-                    Pay pay=new Pay();
+                    int rowNo = table1.getSelectedRow();//获取所选的行号
+                    int id=(int)table1.getValueAt(rowNo, 0);
+                    String title=(String)table1.getValueAt(rowNo, 1);
+                    Float price=(Float)table1.getValueAt(rowNo, 2);
+                    String description=(String)table1.getValueAt(rowNo, 3);
+                    int sales=(int)table1.getValueAt(rowNo, 4);
+                    String img_url=(String)table1.getValueAt(rowNo, 5);
+
+                    Item item=new Item(id,title,price,description,sales,img_url);
+
+                    Pay pay=new Pay(item);
                     pay.setVisible(true);
                 }
         );

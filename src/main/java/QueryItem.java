@@ -128,8 +128,17 @@ public class QueryItem extends JFrame {
         button5.setBounds(810, 355, 100, 30);
         button5.addActionListener(
                 (e)->{
-                    this.setVisible(false);
-                    Pay pay=new Pay();
+                    int rowNo = table1.getSelectedRow();//获取所选的行号
+                    int id=(int)table1.getValueAt(rowNo, 0);
+                    String title=(String)table1.getValueAt(rowNo, 1);
+                    Float price=(Float)table1.getValueAt(rowNo, 2);
+                    String description=(String)table1.getValueAt(rowNo, 3);
+                    int sales=(int)table1.getValueAt(rowNo, 4);
+                    String img_url=(String)table1.getValueAt(rowNo, 5);
+
+                    Item item=new Item(id,title,price,description,sales,img_url);
+
+                    Pay pay=new Pay(item);
                     pay.setVisible(true);
                 }
         );
