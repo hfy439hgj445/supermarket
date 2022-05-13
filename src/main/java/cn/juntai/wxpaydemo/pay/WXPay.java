@@ -1,6 +1,9 @@
 package cn.juntai.wxpaydemo.pay;
 
+import cn.juntai.wxpaydemo.bean.Order;
 import cn.juntai.wxpaydemo.sdk.WXPayUtil;
+import cn.juntai.wxpaydemo.service.OrderService;
+import cn.juntai.wxpaydemo.service.impl.OrderServiceImpl;
 import cn.juntai.wxpaydemo.util.DateUtil;
 import com.google.zxing.BarcodeFormat;
 import com.google.zxing.EncodeHintType;
@@ -15,10 +18,11 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.SortedMap;
-import java.util.TreeMap;
+import java.sql.Timestamp;
+import java.text.SimpleDateFormat;
+import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class WXPay {
 
@@ -63,7 +67,8 @@ public class WXPay {
         map.put("auth_code", auth_code);
         map.put("body", name);
         map.put("device_info", "013467007045764");
-        map.put("nonce_str", WXPayUtil.generateNonceStr());
+        String nonce_str=WXPayUtil.generateNonceStr();
+        map.put("nonce_str", nonce_str);
         map.put("out_trade_no", out_trade_no);
         map.put("spbill_create_ip", spbill_create_ip);
         float price_f=Float.valueOf(price)*100;
@@ -83,6 +88,98 @@ public class WXPay {
         } catch (Exception e) {
             e.printStackTrace();
             log.error("微信支付失败" + e);
+        }
+        Map<String, String> data = new HashMap<>(16);
+        data.put("out_trade_no", out_trade_no);
+        data.put("appid","wxd9a46e74fc279fcc");
+        data.put("mch_id", "1623889015");
+        data.put("nonce_str",nonce_str);
+        data.put("sign",sign);
+
+        //调用微信的查询接口
+        Thread.sleep(10000);/*线程停止10秒，即支付时间*/
+
+        Map<String, String> orderQuery = wxpay.orderQuery(data);
+        String orderResp = WXPayUtil.mapToXml(orderQuery);
+        System.out.println("回调结果:::::::"+orderResp);
+
+        String transaction_id=orderResp.substring(83,111);
+        String mch_id=orderResp.substring(459,469);
+
+        System.out.println(transaction_id);
+        System.out.println(mch_id);
+
+        String pattern=".+<time_end>(\\d{14})";
+//        String pattern="";
+//                ".+<mch_id>(\\d{10})";
+//                ".+<out_trade_no>(\\d{14})"
+
+//                ".+<transaction_id>(.+)</transaction_id>.+"+
+//                        "<mch_id>(.+)</mch_id>.+"+
+//                        "<out_trade_no>(.+)</out_trade_no>.+"+
+//                        "<attach>(.+)</attach>.+"+
+//                        "<time_end>(.+)</time_end>";
+
+//        String pattern =
+//                        ".+<transaction_id><!\\[CDATA\\[(\\d{28})"+
+//                        "<mch_id><!\\[CDATA\\[(\\d{10}).+" +
+//                        "<out_trade_no><!\\[CDATA\\[(.{32}).+" +
+//                        "<attach><!\\[CDATA\\[(.+);.+" +
+//                        "<time_end><!\\[CDATA\\[(\\d{14}).+";
+//        String pattern =
+//                ".+<attach><!\\[CDATA\\[(.+);.+" +
+//                        "<mch_id><!\\[CDATA\\[(\\d{10}).+" +
+//                        "<out_trade_no><!\\[CDATA\\[(.{32}).+" +
+//                        "<time_end><!\\[CDATA\\[(\\d{14}).+" +
+//                        "<transaction_id><!\\[CDATA\\[(\\d{28})";
+        //System.out.println(pattern);
+        Pattern r = Pattern.compile(pattern);
+        // 现在创建 matcher 对象
+        Matcher m = r.matcher(orderResp);
+
+
+        if (m.find()){
+//            String transaction_id = m.group(1);
+//            System.out.println(transaction_id);
+//
+//            String mch_id=m.group(2);
+//            System.out.println(mch_id);
+
+            String orderTime=m.group(1);
+            System.out.println(orderTime);
+
+
+//            String item_id = id;
+//            System.out.println(item_id);
+//
+//            String item_price = price;
+//            System.out.println(item_price);
+//
+//            String item_amount = amount;
+//            System.out.println(item_amount);
+
+
+            float Order_price=Float.parseFloat(price)*Integer.parseInt(amount);
+
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMddHHmmss");
+            Timestamp timestamp = new Timestamp(sdf.parse(orderTime).getTime());
+
+            Order order = new Order();
+            String ID = UUID.randomUUID().toString().replace("-", "");
+            order.setId(ID);//会自动生成32个字符
+            order.setMch_id(Integer.parseInt(mch_id));
+            order.setOut_trade_no(out_trade_no);
+            order.setOrder_time(timestamp);
+            order.setTransaction_id(transaction_id);
+            order.setUserId(0);
+            order.setItem_id(Integer.parseInt(id));
+            order.setItem_price(Float.parseFloat(price));
+            order.setAmount(Integer.parseInt(amount));
+            order.setOrder_price(Order_price);
+
+            OrderService orderService = new OrderServiceImpl();
+            orderService.newOrder(order, id, amount);
+
         }
         //判断支付是否成功
         /*String return_code = null;
@@ -139,10 +236,10 @@ public class WXPay {
         log.error("微信支付失败！");*/
         return "";
     }
-
     /*
     下单：生成二维码
      */
+
     public static void unifiedOrder(String id,String name,String price,String amount) {
         Map<String, String> resultMap = new HashMap();
         String openid = "ouR0E1oP5UGTEBce8jZ_sChfH26g";
