@@ -29,6 +29,8 @@ public class AddItem extends JFrame {
         textField5 = new JTextField();
         label6 = new JLabel();
         textField6 = new JTextField();
+        JLabel label7 = new JLabel();
+        JTextField textField7 = new JTextField();
         button1 = new JButton();
 
         //======== this ========
@@ -82,6 +84,13 @@ public class AddItem extends JFrame {
         contentPane.add(textField6);
         textField6.setBounds(300, 140, 130, 20);
 
+        //---- label7 ----
+        label7.setText("\u5E93\u5B58\u6570\u91CF\uff1a");
+        contentPane.add(label7);
+        label7.setBounds(20, 200, 90, 20);
+        contentPane.add(textField7);
+        textField7.setBounds(80, 200, 130, 20);
+
 
         //---- button1 ----
         button1.setText("保存");
@@ -95,19 +104,24 @@ public class AddItem extends JFrame {
                     String description=textField4.getText();
                     String sales=textField5.getText();
                     String img_url=textField6.getText();
+                    String num=textField7.getText();
 
                     Connection conn = null;
                     String user = "root";
                     String dbPassword = "Mysql_123456";
                     String url = "jdbc:mysql://118.190.148.144:3306/supermarket?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true";
                     PreparedStatement pstmt = null;
+                    PreparedStatement pstmt1 = null;
                     String sql ="INSERT INTO item values('"+id+"','"+title+"','"+price+"','"+description+"',"+sales+",'"+img_url+"')";
+                    String sql1 = "INSERT INTO stock(stock,item_id) values ('"+num+"','"+id+"')";
 
                     try{
                         conn = DriverManager.getConnection(url, user, dbPassword);
                         pstmt = conn.prepareStatement(sql);
+                        pstmt1 = conn.prepareStatement(sql1);
 
                         pstmt.executeUpdate();
+                        pstmt1.executeUpdate();
 
                         if(sql!=null){
                             this.setVisible(false);
